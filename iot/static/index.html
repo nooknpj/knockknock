@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> IoT: Electronic Bell </title>
+    <!-- <link rel='stylesheet' href='/bootstrap/dist/css/bootstrap.css' /> -->
+    <script type="text/javascript" src="/jquery/dist/jquery.min.js"></script>
+    <style type="text/css">
+        .bg-image {
+
+            padding: 0;
+            margin: 0;
+
+            height: 100vh;
+            width: 100vw;
+            /* display: flex; */
+
+            background-image: url("background.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            /* background-size: 100% 100%; */
+            background-size: cover;
+
+            filter: blur(1px);
+            -webkit-filter: blur(1px);
+        }
+
+        .data {
+            display: flex;
+            justify-content: center;
+            text-align: center;
+            align-items: center;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+
+            font-family: sans-serif;
+            color: #cccccc;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked+.slider {
+            /* background-color: #2196F3; */
+            background: #90ee90;
+        }
+
+        input:focus+.slider {
+            /* box-shadow: 0 0 1px #2196F3; */
+            box-shadow: 0 0 1px #90ee90;
+        }
+
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+
+    <script type='text/javascript'>
+        $(document).ready(() => {
+            getStatus();
+        })
+
+        function getStatus() {
+            $.ajax({
+                method: "GET",
+                url: "/status",
+                success: (res) => {
+                    console.log(res);
+                    if ($("#door").is(":checked") != res.status) {
+                        $("#door").trigger("click");  // checked
+                    }
+
+                    if (res.detected) {
+                        $("#warn").fadeIn();
+                    } else {
+                        $("#warn").fadeOut();
+                    }
+                }
+            })
+        }
+
+        function updateStatus() {
+            $.ajax({
+                method: "GET",
+                url: ($("#door").is(":checked") ? "/open" : "/close"),
+                success: (res) => {
+                    getStatus();
+                },
+                error: (err) => console.log(err)
+            })
+        }
+
+        setInterval(getStatus, 1000);
+
+    </script>
+</head>
+
+<body>
+    <div class="data">
+        <div class="bg-image">
+            
+        </div>
+        <div style="position: absolute;">
+            <h1> ELECTRONIC BELL </h1>
+            <hr width="100%">
+            <h2>
+                <label class="switch">
+                    <input id="door" type="checkbox" onclick="updateStatus();">
+                    <span class="slider round"></span>
+                </label>
+                <span id="warn" style="display: none;">
+                    <br> <br>
+                    <img src="alert.png"/ width="20px" height="20px">
+                    There is somebody at the door
+                </span>
+            </h2>
+        </div>
+    </div>
+</body>
+
+</html>
