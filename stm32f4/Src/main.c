@@ -173,6 +173,12 @@ int main(void)
 
 	  if (change_door_status) {
 		  change_door_status = 0;
+
+		  switch (door_status) {
+		  case OPEN: door_status = CLOSE; break;
+		  case CLOSE: door_status = OPEN; break;
+		  }
+
 		  HAL_UART_Transmit(&huart3, &door_status, 1, 100);
 	  }
 
